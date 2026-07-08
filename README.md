@@ -102,8 +102,7 @@ docs/
 ## Tecnologias
 
 VBA (Excel) · SFTP/WinSCP · Bloomberg (arquivos de mercado) · FRED API
-(REST/JSON) · calendário de dias úteis customizado · logging estruturado em
-CSV
+(REST/JSON) · calendário de dias úteis customizado 
 
 ## O que foi intencionalmente omitido
 
