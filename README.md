@@ -1,7 +1,7 @@
 # Automação do fechamento diário de MTM de swaps
 
 **Um projeto de controle e redução de risco operacional**, desenvolvido para
-eliminar um processo manual crítico dentro de uma instituição financeira.
+aumentar a precisão da coleta e autalização das informações. 
 
 > Este é um estudo de caso publicado para fins de avaliação profissional.
 > Por confidencialidade, nomes de cliente, contraparte e empregador não são
