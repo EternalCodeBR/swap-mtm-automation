@@ -3,11 +3,11 @@
 **Um projeto de controle e redução de risco operacional**, desenvolvido para
 aumentar a precisão da coleta e autalização das informações. 
 
-> Este é um estudo de caso publicado para fins de avaliação profissional.
+> Este é um estudo de caso publicado para fins de portfólio de trabalho.
 > Por confidencialidade, nomes de cliente, contraparte e empregador não são
 > citados, e nenhum código-fonte, dado real ou material proprietário está
-> incluído aqui. O objetivo é apresentar o raciocínio de risco e controle
-> por trás da solução — a leitura não exige conhecimento técnico.
+> incluído aqui. O objetivo é apresentar o raciocínio e lógica utilizada
+> por trás da solução.
 
 ## O risco que existia
 
