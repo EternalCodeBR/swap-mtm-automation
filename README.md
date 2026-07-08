@@ -1,116 +1,81 @@
-# Atualizador de Swaps — Orquestração de Marcação a Mercado (VBA)
+# Automação do fechamento diário de MTM de swaps
 
-Automação do fechamento diário de MTM/PU de uma carteira de contratos de swap
-(SWAP JPYBRL), substituindo um processo manual, planilha por planilha, por uma
-rotina orquestrada com fontes de dados integradas (Bloomberg, FRED API, provedor
-de curvas via SFTP), calendário de dias úteis, log auditável e arquitetura
-data-driven para escalar o número de contratos sem alterar código.
+**Um projeto de controle e redução de risco operacional**, desenvolvido para
+eliminar um processo manual crítico dentro de uma instituição financeira.
 
-> Projeto profissional, publicado como amostra de código para processo seletivo.
-> Nomes de cliente, contraparte, empregador, credenciais e o layout visual das
-> planilhas foram removidos ou substituídos por valores fictícios. Nenhum dado
-> real de mercado, cliente ou contraparte está presente neste repositório.
+> Este repositório é uma amostra de código, publicada para fins de avaliação
+> profissional. Nomes de cliente, contraparte, empregador e qualquer
+> credencial de acesso foram removidos ou substituídos por valores
+> fictícios. O objetivo aqui não é o código em si, mas o raciocínio de
+> risco e controle por trás dele — a leitura não exige conhecimento
+> técnico.
 
-## Problema
+## O risco que existia
 
-O fechamento diário do MTM de cada contrato de swap era feito **manualmente,
-calculadora por calculadora**: baixar as curvas do dia via SFTP, localizar os
-arquivos de mercado da Bloomberg, abrir cada planilha, colar os dados na aba
-certa, atualizar a taxa de CDI e conferir se o "Check" fechava em OK. Isso
-tinha custos concretos:
+O fechamento diário da marcação a mercado (MTM) de uma carteira de swaps
+dependia de um processo manual, repetido planilha por planilha: baixar dados
+de mercado do dia, localizar o arquivo certo, copiar os valores na aba
+certa, atualizar a taxa e conferir se o resultado batia. Do ponto de vista
+de controle, isso significava três riscos concretos:
 
-- **Tempo**: minutos por calculadora, multiplicado por cada contrato ativo,
-  todos os dias úteis.
-- **Conhecimento tribal**: cada calculadora tinha sua própria célula de data
-  e de validação (`N6`, `M6` ou `P6`, dependendo do contrato) — só quem já
-  tinha mexido naquela planilha sabia onde colar o quê.
-- **Escalabilidade zero**: adicionar um novo contrato exigia alterar código
-  VBA hardcoded, em vez de apenas cadastrar o novo ativo.
-- **Erro operacional silencioso**: sem log estruturado, uma curva não
-  encontrada ou uma data errada só aparecia quando alguém abria a planilha e
-  reparava manualmente.
+- **Risco de pessoa-chave.** Cada planilha tinha suas particularidades, e
+  só quem já tinha operado aquela planilha específica sabia exatamente onde
+  cada dado deveria entrar. O processo dependia do conhecimento de uma
+  pessoa, não de uma regra documentada e repetível.
+- **Risco de erro silencioso.** Sem um registro estruturado de cada etapa,
+  uma taxa desatualizada ou um dado colado no lugar errado só era percebido
+  quando alguém abria a planilha depois — nunca no momento em que o erro
+  acontecia.
+- **Risco de escala.** Cada novo contrato adicionado à carteira significava
+  mais um processo manual repetido todos os dias úteis, sem nenhum ganho de
+  eficiência com o crescimento do volume.
 
-## Solução
+Em uma instituição regulada, um processo de marcação a mercado que depende
+de memória individual e não deixa rastro auditável é, por definição, um
+ponto cego de controle.
 
-Uma rotina VBA orquestrada em módulos, com separação clara de
-responsabilidades e arquitetura **data-driven** (a lista de contratos vive
-numa aba de configuração, não no código):
+## O que foi construído
 
-- **Orquestrador central** (`FluxoCompleto`): dirige o fluxo do fim ao fim —
-  resolve D-1/D-2 pelo calendário de dias úteis, localiza/copia a pasta MTM
-  do dia, baixa e valida as curvas, dispara a atualização de cada contrato e
-  grava um log físico (CSV) auditável, espelhado numa aba de Log.
-- **Calendário de dias úteis** próprio, alimentado por uma aba de feriados.
-- **Download automático de curvas** via SFTP (script gerado dinamicamente
-  para o WinSCP) — credenciais **sempre lidas de parâmetro em runtime**,
-  nunca hardcoded no código-fonte.
-- **Integração com Bloomberg e FRED API**: localização automática dos
-  arquivos de câmbio/curva do dia (estrutura de pastas ano/mês/dia) e
-  consulta HTTP para a taxa SOFR diária, com parser de JSON tolerante a
-  locale (evita o bug clássico do VBA de interpretar `.` como separador de
-  milhar em `pt-BR`).
-- **Atualização das calculadoras com auto-detecção**: a macro lê a fórmula
-  da célula de validação de cada planilha para descobrir sozinha onde fica a
-  célula de data, em vez de depender de um mapeamento hardcoded por
-  contrato. Override manual disponível para os casos que fogem do padrão.
-- **Cadastro assistido** (`IncluirCalculadora`): adicionar um novo contrato
-  é preencher um assistente em tela, não editar código — a macro de
-  atualização já processa qualquer linha nova da configuração.
-- **Sincronização de código** (`SincronizarModulosVBA`): reimporta os módulos
-  `.bas` do disco para dentro do workbook com um clique, eliminando o passo
-  manual de Alt+F11 → remover módulo → importar arquivo a cada alteração.
+Uma rotina automatizada que assume o fechamento diário do início ao fim,
+substituindo a execução manual por um processo padronizado e verificável:
+
+- **Padronização do processo**: a rotina segue sempre a mesma sequência de
+  validações, independente de quem a executa ou de quantos contratos
+  existam na carteira — elimina a dependência de conhecimento individual.
+- **Coleta automática dos dados de mercado**: busca as fontes externas
+  necessárias (curvas de juros, taxas de câmbio, taxas de referência) sem
+  intervenção manual, reduzindo o risco de usar um dado errado ou
+  desatualizado.
+- **Registro auditável de cada execução**: cada etapa do fechamento fica
+  registrada — o que foi buscado, o que foi atualizado, o que falhou — em
+  um log que permite reconstruir exatamente o que aconteceu em qualquer dia,
+  a qualquer momento.
+- **Sinalização imediata de exceções**: em vez de descobrir um problema
+  quando alguém abre a planilha por acaso, a rotina evidencia na hora quais
+  contratos fecharam corretamente e quais precisam de atenção.
+- **Escala sem esforço adicional**: novos contratos são incorporados por um
+  cadastro simples, sem exigir alterações manuais recorrentes no processo a
+  cada crescimento da carteira.
+- **Credenciais de acesso fora do processo**: nenhuma senha ou chave de
+  acesso a sistemas externos fica fixa dentro da rotina — são informadas em
+  ambiente controlado, separado do código.
 
 ## Resultado
 
-- Fechamento de todos os contratos: de um processo manual, calculadora por
-  calculadora, para **uma única macro** (`FluxoCompleto`).
-- **Zero alteração de código** para escalar: novos contratos entram por um
-  assistente de cadastro; a arquitetura já suportava a carteira crescer sem
-  tocar em VBA.
-- **Log auditável**: cada etapa (curva localizada, contrato atualizado,
-  falha de parsing, curva ausente) fica registrada em CSV, permitindo
-  reconstruir o que aconteceu em qualquer dia de fechamento.
-- **Erros operacionais visíveis na hora**: farol de status por contrato
-  (aba de configuração) mostra imediatamente quem fechou OK e quem precisa
-  de atenção, em vez de descobrir o problema só quando alguém abre a
-  planilha.
-- **Credenciais fora do código-fonte**: SFTP e chave de API passaram a ser
-  parâmetros de configuração, não constantes hardcoded (correção aplicada
-  especificamente para esta publicação, documentada em `docs/roadmap.md`).
-- Roadmap de evolução já definido para migrar a orquestração para um serviço
-  Java/Spring Boot centralizado, com dashboard web (ver `docs/`).
+- O fechamento deixou de ser um conjunto de tarefas manuais repetidas por
+  contrato e passou a ser **uma rotina única, padronizada e auditável**.
+- **Rastro de auditoria completo**: qualquer divergência pode ser
+  reconstruída depois, com evidência de qual dado foi usado e quando.
+- **Erros passaram a ser visíveis no momento em que ocorrem**, não semanas
+  depois, quando já é tarde para corrigir a causa.
+- **Dependência de pessoa-chave eliminada**: o processo não depende mais de
+  alguém lembrar onde cada dado vai em cada planilha.
+- Um plano de evolução já foi desenhado para migrar essa automação para uma
+  plataforma centralizada, com painel de acompanhamento web — passo natural
+  para consolidar o controle em um único ponto de governança.
 
-## Estrutura do repositório
+## Sobre a publicação deste projeto
 
-```text
-vba/
-  Mod0_SyncModulos.bas          # Sincroniza os .bas do disco com o workbook
-  Mod1_Orquestrador.bas         # Fluxo principal, log, resolução de datas
-  Mod2_DiasUteis.bas            # Calendário de dias úteis (feriados custom)
-  Mod3_PastasMTM.bas            # Localização/cópia das pastas MTM D-1/D-2
-  Mod4_INETX.bas                # Localização do arquivo de curvas separadas
-  Mod5_Calculadoras.bas         # Loop de atualização + auto-detecção de célula
-  Mod6_Bloomberg.bas            # Integração Bloomberg (câmbio/curva) + FRED API
-  Mod7_IncluirCalculadora.bas   # Assistente de cadastro de novos contratos
-  Mod8_DownloadINETX.bas        # Download das curvas via SFTP (WinSCP)
-  Modulo_BaixaArquivosINETX.bas # Versão standalone anterior (referência histórica)
-docs/
-  roadmap.md                    # Estado do projeto e decisão de migração
-  arquitetura-java-futura.md    # Estrutura Maven planejada para a v2 (Java)
-```
-
-## Tecnologias
-
-VBA (Excel) · SFTP/WinSCP · Bloomberg (arquivos de mercado) · FRED API
-(REST/JSON) · calendário de dias úteis customizado · logging estruturado em
-CSV
-
-## O que foi intencionalmente omitido
-
-- Nomes reais de cliente, contraparte, empregador e contratos (substituídos
-  por nomes fictícios de forma consistente em todo o código).
-- Credenciais de SFTP e chave de API (removidas; a rotina exige que sejam
-  configuradas em runtime).
-- O arquivo `.xlsm` em si e qualquer script que definisse o layout visual da
-  calculadora (cores, posição de células, painel de KPIs) — o repositório
-  mostra a lógica de automação, não a planilha proprietária da empresa.
+O código-fonte completo (VBA/Excel) está neste repositório para quem quiser
+avaliar a implementação técnica. Para uma conversa sobre a lógica de risco
+e controle por trás da solução — sem entrar em código — fico à disposição.
