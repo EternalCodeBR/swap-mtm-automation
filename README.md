@@ -1,12 +1,10 @@
 # Atualizador de Swaps — Orquestração de Marcação a Mercado (VBA)
 
-Automação do fechamento diário de MTM/PU de uma carteira de contratos de swap
-(SWAP JPYBRL), substituindo um processo manual, planilha por planilha, por uma
+Automação do fechamento diário de MTM/PU de uma carteira de contratos de swap, substituindo um processo manual, planilha por planilha, por uma
 rotina orquestrada com fontes de dados integradas (Bloomberg, FRED API, provedor
-de curvas via SFTP), calendário de dias úteis, log auditável e arquitetura
-data-driven para escalar o número de contratos sem alterar código.
+de curvas via SFTP), calendário de dias úteis, log auditável para escalar o número de contratos sem alterar código.
 
-> Projeto profissional, publicado como amostra de código para processo seletivo.
+> Projeto profissional, publicado como amostra de código.
 > Nomes de cliente, contraparte, empregador, credenciais e o layout visual das
 > planilhas foram removidos ou substituídos por valores fictícios. Nenhum dado
 > real de mercado, cliente ou contraparte está presente neste repositório.
