@@ -1,0 +1,17 @@
+# Excel / dados reais NUNCA versionar
+*.xlsm
+*.xlsx
+*.xlsb
+*.xls
+*.csv
+~$*
+
+# Segredos / configuração local
+*.env
+Parametros.txt
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
