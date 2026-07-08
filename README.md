@@ -3,12 +3,11 @@
 **Um projeto de controle e redução de risco operacional**, desenvolvido para
 eliminar um processo manual crítico dentro de uma instituição financeira.
 
-> Este repositório é uma amostra de código, publicada para fins de avaliação
-> profissional. Nomes de cliente, contraparte, empregador e qualquer
-> credencial de acesso foram removidos ou substituídos por valores
-> fictícios. O objetivo aqui não é o código em si, mas o raciocínio de
-> risco e controle por trás dele — a leitura não exige conhecimento
-> técnico.
+> Este é um estudo de caso publicado para fins de avaliação profissional.
+> Por confidencialidade, nomes de cliente, contraparte e empregador não são
+> citados, e nenhum código-fonte, dado real ou material proprietário está
+> incluído aqui. O objetivo é apresentar o raciocínio de risco e controle
+> por trás da solução — a leitura não exige conhecimento técnico.
 
 ## O risco que existia
 
@@ -74,8 +73,10 @@ substituindo a execução manual por um processo padronizado e verificável:
   plataforma centralizada, com painel de acompanhamento web — passo natural
   para consolidar o controle em um único ponto de governança.
 
-## Sobre a publicação deste projeto
+## Sobre esta publicação
 
-O código-fonte completo (VBA/Excel) está neste repositório para quem quiser
-avaliar a implementação técnica. Para uma conversa sobre a lógica de risco
-e controle por trás da solução — sem entrar em código — fico à disposição.
+Por se tratar de um processo real de uma instituição financeira, o
+código-fonte, a planilha e qualquer material que identifique cliente,
+contraparte ou empregador não são publicados aqui. Para uma conversa sobre
+a lógica de risco e controle por trás da solução — ou para uma
+demonstração — fico à disposição.
