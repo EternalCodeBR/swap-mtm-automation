@@ -13,10 +13,12 @@ desenvolvido para aumentar a precisão da coleta e atualização das informaçõ
 ## O risco que existia
 
 O fechamento diário da marcação a mercado (MTM) de uma carteira de swaps
-dependia de um processo manual, repetido planilha por planilha: baixar dados
-de mercado do dia, localizar o arquivo certo, copiar os valores na aba
-certa, atualizar a taxa e conferir se o resultado batia. Do ponto de vista
-de controle, isso significava três riscos concretos:
+dependia de um processo manual, repetido planilha por planilha em **14
+calculadoras**: baixar dados de mercado do dia, localizar o arquivo certo,
+copiar os valores na aba certa, atualizar a taxa e conferir se o resultado
+batia. Somadas, essas tarefas consumiam **entre 1h e 1h30 de um analista,
+todos os dias úteis**. Do ponto de vista de controle, isso significava três
+riscos concretos:
 
 - **Risco de pessoa-chave.** Cada planilha tinha suas particularidades, e
   só quem já tinha operado aquela planilha específica sabia exatamente onde
@@ -36,10 +38,12 @@ substituindo a execução manual por um processo padronizado e verificável:
 - **Padronização do processo**: a rotina segue sempre a mesma sequência de
   validações, independente de quem a executa ou de quantos contratos
   existam na carteira.
-- **Coleta automática dos dados de mercado**: busca as fontes externas
-  necessárias (curvas de juros, taxas de câmbio, taxas de referência) sem
-  intervenção manual, reduzindo o risco de usar um dado errado ou
-  desatualizado.
+- **Coleta automática dos dados de mercado**: busca **três fontes externas
+  distintas** (curvas de mercado via SFTP, extrações do terminal Bloomberg e
+  a API do Federal Reserve — FRED), cobrindo **sete famílias de curvas e
+  taxas** (pré, cupom cambial, forwards de moeda, SOFR e CDI), sem
+  intervenção manual — reduzindo o risco de usar um dado errado ou
+  desatualizado. O calendário de dias úteis segue ANBIMA/B3.
 - **Registro auditável de cada execução**: cada etapa do fechamento fica
   registrada: o que foi buscado, o que foi atualizado, o que falhou. 
   Todas as informações em um log que permite reconstruir exatamente o que aconteceu em qualquer dia, a qualquer momento.
@@ -55,6 +59,9 @@ substituindo a execução manual por um processo padronizado e verificável:
 
 ## Resultado
 
+- **De 1h–1h30 de trabalho manual por dia para uma rotina de 3 a 5 minutos**,
+  executada com poucos cliques — uma redução de mais de 90% no tempo de
+  fechamento, com as 14 calculadoras atualizadas em um único fluxo.
 - O fechamento deixou de ser um conjunto de tarefas manuais repetidas por
   contrato e passou a ser **uma rotina única, padronizada e pronta para auditoria, se necessário**.
 - **Erros passaram a ser visíveis no momento em que ocorrem**, não semanas
